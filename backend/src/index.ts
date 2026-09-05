@@ -20,6 +20,15 @@ const apolloServer = new ApolloServer<GraphQLContext>({
   // continua visível no log local; o cliente recebe só a mensagem.
   includeStacktraceInErrorResponses: false,
   /**
+   * Por padrão o Apollo instala os próprios handlers de SIGINT/SIGTERM e
+   * chama stop() ao receber o sinal. Como este arquivo já faz o
+   * encerramento ordenado, os dois disputavam: o stop() daqui ficava
+   * esperando o stop() interno, que por sua vez aguardava o fim do
+   * processo — e nada terminava. O desligamento é responsabilidade de
+   * shutdown() abaixo.
+   */
+  stopOnTerminationSignals: false,
+  /**
    * Ponto único de tradução de erros: AppError vira um erro GraphQL com
    * `code` estável e mensagem própria. Qualquer outra falha continua
    * mascarada pelo Apollo, para não vazar detalhe interno do banco.
