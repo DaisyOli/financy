@@ -7,3 +7,7 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# Instruções internas do projeto: documento de processo, não de produto.
+# Permanece no disco para orientar o desenvolvimento.
+CLAUDE.md
