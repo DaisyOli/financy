@@ -1,0 +1,14 @@
+node_modules
+dist
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# SQLite development database
+*.db
+*.db-journal
+
+# Prisma Client gerado (recriado pelo postinstall / db:generate)
+src/generated

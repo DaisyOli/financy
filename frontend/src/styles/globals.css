@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+/*
+ * Design system do Financy.
+ * Fonte única dos valores visuais: nenhum hex deve ser escrito nos
+ * componentes. Cores conferidas contra o Style Guide do Figma.
+ */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand */
+  --color-brand-dark: #124b2b;
+  --color-brand-base: #1f6f43;
+
+  /* Grayscale */
+  --color-gray-800: #111827;
+  --color-gray-700: #374151;
+  --color-gray-600: #4b5563;
+  --color-gray-500: #6b7280;
+  --color-gray-400: #9ca3af;
+  --color-gray-300: #d1d5db;
+  --color-gray-200: #e5e7eb;
+  --color-gray-100: #f8f9fa;
+
+  /* Feedback */
+  --color-danger: #ef4444;
+  --color-success: #19ad70;
+
+  /* Famílias auxiliares — chaves semânticas das categorias */
+  --color-blue-dark: #1d4ed8;
+  --color-blue-base: #2563eb;
+  --color-blue-light: #dbeafe;
+
+  --color-purple-dark: #7e22ce;
+  --color-purple-base: #9333ea;
+  --color-purple-light: #f3e8ff;
+
+  --color-pink-dark: #be185d;
+  --color-pink-base: #db2777;
+  --color-pink-light: #fce7f3;
+
+  --color-red-dark: #b91c1c;
+  --color-red-base: #dc2626;
+  --color-red-light: #fee2e2;
+
+  --color-orange-dark: #c2410c;
+  --color-orange-base: #ea580c;
+  --color-orange-light: #ffedd5;
+
+  --color-yellow-dark: #a16207;
+  --color-yellow-base: #ca8a04;
+  --color-yellow-light: #fef3ca;
+
+  --color-green-dark: #15803d;
+  --color-green-base: #16a34a;
+  --color-green-light: #e0fae9;
+}
+
+/*
+ * Medidas inferidas visualmente dos prints, que não trazem os valores
+ * numéricos (CLAUDE.md seção 30). Centralizadas para ficarem consistentes.
+ */
+:root {
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --height-control: 44px;
+  --height-button: 48px;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-800);
+  }
+}

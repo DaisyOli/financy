@@ -1,0 +1,85 @@
+// Financy — modelo de dados
+// SQLite via Prisma. Regras de domínio em CLAUDE.md (seções 11, 12 e 15).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+/// Tipo de transação. A UI usa rótulos diferentes por contexto
+/// (Receita/Entrada, Despesa/Saída), mas o domínio tem um único conceito.
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+/// Chave semântica de cor da categoria — nunca hex.
+/// O design system do frontend mapeia a chave para os tokens dark/base/light.
+enum CategoryColor {
+  green
+  blue
+  purple
+  pink
+  red
+  orange
+  yellow
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  categories   Category[]
+  transactions Transaction[]
+}
+
+model Category {
+  id          String        @id @default(uuid())
+  title       String
+  description String?
+  /// Identificador de ícone do Lucide (ex.: "shopping-cart"), nunca SVG.
+  icon        String
+  color       CategoryColor
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+model Transaction {
+  id            String          @id @default(uuid())
+  description   String
+  type          TransactionType
+  /// Valor em centavos inteiros. Nunca ponto flutuante.
+  amountInCents Int
+  /// Data-only no formato YYYY-MM-DD. String proposital: evita
+  /// deslocamento de fuso horário. Não converter para Date.
+  date          String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  /// Restrict preserva o histórico financeiro: excluir uma categoria
+  /// com transações é rejeitado pelo banco (CLAUDE.md seção 15).
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([userId, date])
+  @@index([userId, type])
+  @@index([categoryId])
+}

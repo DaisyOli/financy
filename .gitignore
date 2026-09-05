@@ -1,0 +1,9 @@
+# Dependências e artefatos ficam nos .gitignore de cada aplicação.
+# Este arquivo cobre apenas o que é comum à raiz do repositório.
+
+.DS_Store
+Thumbs.db
+
+.vscode/*
+!.vscode/extensions.json
+.idea
