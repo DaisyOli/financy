@@ -1,6 +1,7 @@
 import { NotFoundError } from "../errors/app-error.js";
 import type { Prisma } from "../generated/prisma/client.js";
 import type { TransactionType } from "../generated/prisma/enums.js";
+import { normalizeForSearch } from "../lib/normalize-text.js";
 import { prisma } from "../lib/prisma.js";
 import {
   requireText,
@@ -86,8 +87,12 @@ async function findOwnedTransaction(userId: string, id: string): Promise<{ id: s
 }
 
 function parseInput(input: TransactionData) {
+  const description = requireText(input.description, "descrição");
+
   return {
-    description: requireText(input.description, "descrição"),
+    description,
+    // Campo derivado, sempre recalculado a partir da descrição.
+    descriptionSearch: normalizeForSearch(description),
     type: input.type,
     amountInCents: validateAmountInCents(input.amountInCents),
     date: validateTransactionDate(input.date),
@@ -101,7 +106,9 @@ function buildWhere(userId: string, filters: TransactionFilters): Prisma.Transac
 
   const search = filters.search?.trim();
   if (search) {
-    where.description = { contains: search };
+    // Compara sem acento e sem caixa dos dois lados: quem digita
+    // "salario" encontra "Salário".
+    where.descriptionSearch = { contains: normalizeForSearch(search) };
   }
 
   if (filters.type) {

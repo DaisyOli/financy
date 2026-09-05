@@ -47,7 +47,7 @@ export function AppHeader() {
           aria-label="Abrir perfil"
           className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-base"
         >
-          <Avatar name={user?.name ?? ""} />
+          <Avatar name={user?.name ?? ""} imageUrl={user?.avatarDataUrl} />
         </button>
       </div>
     </header>

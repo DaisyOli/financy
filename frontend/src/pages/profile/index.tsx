@@ -7,7 +7,7 @@ import { z } from "zod";
 
 import { AppLayout } from "../../components/layout/app-layout";
 import { FormError } from "../../components/layout/auth-layout";
-import { Avatar } from "../../components/ui/avatar";
+import { AvatarPicker } from "../../components/profile/avatar-picker";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
@@ -65,7 +65,7 @@ export function ProfilePage() {
     <AppLayout>
       <Card className="mx-auto max-w-lg p-8">
         <div className="text-center">
-          <Avatar name={user?.name ?? ""} size="lg" className="mx-auto" />
+          <AvatarPicker user={user} onError={setServerError} />
           <h1 className="mt-4 text-2xl font-bold text-gray-800">{user?.name}</h1>
           <p className="text-gray-600">{user?.email}</p>
         </div>

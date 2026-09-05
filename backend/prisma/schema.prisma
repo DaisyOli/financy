@@ -30,12 +30,16 @@ enum CategoryColor {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String   @id @default(uuid())
+  name          String
+  /// Foto do perfil como data URL (image/*;base64). O cliente redimensiona
+  /// antes de enviar, então o valor fica na casa de dezenas de KB e não
+  /// exige servidor de arquivos. Nulo = usa as iniciais do nome.
+  avatarDataUrl String?
+  email         String   @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   categories   Category[]
   transactions Transaction[]
@@ -60,16 +64,20 @@ model Category {
 }
 
 model Transaction {
-  id            String          @id @default(uuid())
-  description   String
-  type          TransactionType
+  id                String          @id @default(uuid())
+  description       String
+  /// Cópia da descrição em minúsculas e sem acentos, usada pela busca.
+  /// O LIKE do SQLite não ignora acentos, então "salario" não encontraria
+  /// "Salário" sem este campo derivado.
+  descriptionSearch String          @default("")
+  type              TransactionType
   /// Valor em centavos inteiros. Nunca ponto flutuante.
-  amountInCents Int
+  amountInCents     Int
   /// Data-only no formato YYYY-MM-DD. String proposital: evita
   /// deslocamento de fuso horário. Não converter para Date.
-  date          String
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  date              String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -79,6 +87,7 @@ model Transaction {
   /// com transações é rejeitado pelo banco (CLAUDE.md seção 15).
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
+  @@index([userId, descriptionSearch])
   @@index([userId, date])
   @@index([userId, type])
   @@index([categoryId])

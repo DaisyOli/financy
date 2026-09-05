@@ -7,6 +7,7 @@ import { CategoryIcon } from "../../components/categories/category-icon";
 import { AppLayout, PageHeader } from "../../components/layout/app-layout";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
+import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { IconButton } from "../../components/ui/icon-button";
 import { EmptyState, ErrorState, LoadingState } from "../../components/ui/states";
 import { Tag } from "../../components/ui/tag";
@@ -48,6 +49,7 @@ export function CategoriesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [toDelete, setToDelete] = useState<Category | null>(null);
 
   const { data, loading, error, refetch } = useQuery<{
     categories: Category[];
@@ -55,7 +57,7 @@ export function CategoriesPage() {
   }>(CATEGORIES);
 
   const client = useApolloClient();
-  const [deleteCategory] = useMutation(DELETE_CATEGORY, {
+  const [deleteCategory, { loading: deleting }] = useMutation(DELETE_CATEGORY, {
     onCompleted: () => refreshTransactionData(client),
   });
 
@@ -69,12 +71,17 @@ export function CategoriesPage() {
     setDialogOpen(true);
   }
 
-  async function handleDelete(category: Category) {
+  async function handleDelete() {
+    if (!toDelete) return;
+
     setDeleteError(null);
 
     try {
-      await deleteCategory({ variables: { id: category.id } });
+      await deleteCategory({ variables: { id: toDelete.id } });
+      setToDelete(null);
     } catch (caught) {
+      setToDelete(null);
+
       if (getErrorCode(caught) === "NOT_FOUND") {
         await refetch();
         setDeleteError(STALE_DATA_MESSAGE);
@@ -162,7 +169,7 @@ export function CategoriesPage() {
                   icon={<Trash2 className="size-4" />}
                   tone="danger"
                   label={`Excluir ${category.title}`}
-                  onClick={() => handleDelete(category)}
+                  onClick={() => setToDelete(category)}
                 />
                 <IconButton
                   icon={<Pencil className="size-4" />}
@@ -190,6 +197,29 @@ export function CategoriesPage() {
       </div>
 
       <CategoryDialog open={dialogOpen} onOpenChange={setDialogOpen} category={editing} />
+
+      <ConfirmDialog
+        open={toDelete !== null}
+        onOpenChange={(open) => !open && setToDelete(null)}
+        title="Excluir categoria"
+        description="Tem certeza que deseja excluir esta categoria?"
+        isPending={deleting}
+        onConfirm={handleDelete}
+        preview={
+          toDelete && (
+            <>
+              <CategoryIcon icon={toDelete.icon} color={toDelete.color} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-gray-800">{toDelete.title}</p>
+                <p className="text-sm text-gray-500">
+                  {toDelete.transactionCount}{" "}
+                  {toDelete.transactionCount === 1 ? "transação" : "transações"}
+                </p>
+              </div>
+            </>
+          )
+        }
+      />
     </AppLayout>
   );
 }

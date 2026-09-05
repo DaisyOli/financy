@@ -133,6 +133,20 @@ A aplicação sobe em **http://localhost:5173**.
 
 **Histórico financeiro preservado.** Categorias com transações não podem ser excluídas — a regra é aplicada no serviço e reforçada por uma restrição de chave estrangeira no banco.
 
+## Melhorias além do escopo obrigatório
+
+Estas funcionalidades vivem na branch `feature/melhorias`. A branch `main`
+contém exatamente o escopo pedido pela Rocketseat.
+
+- **Busca sem acentos** — procurar por `salario` encontra `Salário`. Uma
+  cópia normalizada da descrição é mantida no banco, já que o `LIKE` do
+  SQLite só ignora maiúsculas em caracteres ASCII.
+- **Confirmação ao excluir** — transações e categorias pedem confirmação,
+  mostrando o item que será removido (ícone, descrição, categoria e valor).
+- **Foto de perfil** — a imagem é recortada e reduzida a 256px no próprio
+  navegador antes do envio, então nenhum servidor de arquivos é necessário.
+  O servidor valida formato e tamanho.
+
 ## Licença
 
 Projeto desenvolvido para fins educacionais.

@@ -7,6 +7,7 @@ import { AppLayout, PageHeader } from "../../components/layout/app-layout";
 import { TransactionDialog } from "../../components/transactions/transaction-dialog";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
+import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { IconButton } from "../../components/ui/icon-button";
 import { Input } from "../../components/ui/input";
 import { Pagination } from "../../components/ui/pagination";
@@ -40,6 +41,7 @@ export function TransactionsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Transaction | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [toDelete, setToDelete] = useState<Transaction | null>(null);
 
   // Evita disparar uma consulta a cada tecla digitada. O reset de página
   // acompanha o termo já debounced, para não voltar à página 1 a cada letra.
@@ -87,16 +89,21 @@ export function TransactionsPage() {
   const { data: categoriesData } = useQuery<{ categories: Category[] }>(CATEGORIES);
 
   const client = useApolloClient();
-  const [deleteTransaction] = useMutation(DELETE_TRANSACTION, {
+  const [deleteTransaction, { loading: deleting }] = useMutation(DELETE_TRANSACTION, {
     onCompleted: () => refreshTransactionData(client),
   });
 
-  async function handleDelete(transaction: Transaction) {
+  async function handleDelete() {
+    if (!toDelete) return;
+
     setActionError(null);
 
     try {
-      await deleteTransaction({ variables: { id: transaction.id } });
+      await deleteTransaction({ variables: { id: toDelete.id } });
+      setToDelete(null);
     } catch (caught) {
+      setToDelete(null);
+
       if (getErrorCode(caught) === "NOT_FOUND") {
         await refetch();
         setActionError(STALE_DATA_MESSAGE);
@@ -247,7 +254,7 @@ export function TransactionsPage() {
                             icon={<Trash2 className="size-4" />}
                             tone="danger"
                             label={`Excluir ${transaction.description}`}
-                            onClick={() => handleDelete(transaction)}
+                            onClick={() => setToDelete(transaction)}
                           />
                           <IconButton
                             icon={<Pencil className="size-4" />}
@@ -282,6 +289,37 @@ export function TransactionsPage() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         transaction={editing}
+      />
+
+      <ConfirmDialog
+        open={toDelete !== null}
+        onOpenChange={(open) => !open && setToDelete(null)}
+        title="Excluir transação"
+        description="Tem certeza que deseja excluir esta transação?"
+        isPending={deleting}
+        onConfirm={handleDelete}
+        preview={
+          toDelete && (
+            <>
+              <CategoryIcon
+                icon={toDelete.category.icon}
+                color={toDelete.category.color}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-gray-800">
+                  {toDelete.description}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {formatTransactionDate(toDelete.date)} · {toDelete.category.title}
+                </p>
+              </div>
+              <span className="font-semibold whitespace-nowrap text-gray-800">
+                {toDelete.type === "INCOME" ? "+" : "-"}{" "}
+                {formatCents(toDelete.amountInCents)}
+              </span>
+            </>
+          )
+        }
       />
     </AppLayout>
   );

@@ -14,6 +14,15 @@ export class UserResolver {
     return userService.findAuthenticatedUser(requireUser(context));
   }
 
+  /** Envia ou remove a foto do perfil. `avatarDataUrl` nulo volta às iniciais. */
+  @Mutation(() => User)
+  async updateAvatar(
+    @Arg("avatarDataUrl", () => String, { nullable: true }) avatarDataUrl: string | null,
+    @Ctx() context: GraphQLContext,
+  ): Promise<User> {
+    return userService.updateAvatar(requireUser(context), avatarDataUrl ?? null);
+  }
+
   @Mutation(() => User)
   async updateProfile(
     @Arg("data", () => UpdateProfileInput) data: UpdateProfileInput,

@@ -6,6 +6,7 @@ export const ME = gql`
       id
       name
       email
+      avatarDataUrl
     }
   }
 `;
@@ -18,6 +19,7 @@ export const LOGIN = gql`
         id
         name
         email
+        avatarDataUrl
       }
     }
   }
@@ -37,4 +39,5 @@ export interface AuthUser {
   id: string;
   name: string;
   email: string;
+  avatarDataUrl?: string | null;
 }

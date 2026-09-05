@@ -19,6 +19,10 @@ export class User {
   @Field(() => String)
   email!: string;
 
+  /** Data URL da foto, ou nulo quando o avatar são as iniciais. */
+  @Field(() => String, { nullable: true })
+  avatarDataUrl?: string | null;
+
   @Field(() => Date)
   createdAt!: Date;
 }

@@ -6,6 +6,18 @@ export const UPDATE_PROFILE = gql`
       id
       name
       email
+      avatarDataUrl
+    }
+  }
+`;
+
+export const UPDATE_AVATAR = gql`
+  mutation UpdateAvatar($avatarDataUrl: String) {
+    updateAvatar(avatarDataUrl: $avatarDataUrl) {
+      id
+      name
+      email
+      avatarDataUrl
     }
   }
 `;

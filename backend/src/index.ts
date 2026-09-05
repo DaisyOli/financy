@@ -46,7 +46,10 @@ const app = express();
 app.use(
   "/graphql",
   cors({ origin: env.frontendUrl }),
-  express.json(),
+  // O padrão do Express é 100 KB, insuficiente para o avatar em data URL
+  // (o validador aceita até 400 KB). A folga evita que uma foto legítima
+  // seja recusada pelo parser antes de chegar à validação.
+  express.json({ limit: "1mb" }),
   expressMiddleware(apolloServer, {
     context: async ({ req }) => createContext(req),
   }),

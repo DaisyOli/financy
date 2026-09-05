@@ -3,17 +3,30 @@ import { cn } from "../../lib/cn";
 
 interface AvatarProps {
   name: string;
+  /** Foto do perfil; sem ela, mostra as iniciais do nome. */
+  imageUrl?: string | null;
   size?: "sm" | "lg";
   className?: string;
 }
 
-/** Iniciais do usuário; o Figma não prevê upload de imagem. */
-export function Avatar({ name, size = "sm", className }: AvatarProps) {
+export function Avatar({ name, imageUrl, size = "sm", className }: AvatarProps) {
+  const dimension = size === "sm" ? "size-10 text-sm" : "size-20 text-2xl";
+
+  if (imageUrl) {
+    return (
+      <img
+        src={imageUrl}
+        alt={`Foto de ${name}`}
+        className={cn("shrink-0 rounded-full object-cover", dimension, className)}
+      />
+    );
+  }
+
   return (
     <span
       className={cn(
         "inline-flex shrink-0 items-center justify-center rounded-full bg-gray-200 font-semibold text-gray-700",
-        size === "sm" ? "size-10 text-sm" : "size-20 text-2xl",
+        dimension,
         className,
       )}
     >
